@@ -108,4 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c2ca1fd2643d94b8ef0775315dd4c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  block: {fileID: 1434486325817330}
+  Block: {fileID: 1434486325817330}
+  Speed: 0
+  MaxLength: 0
+  PlusDirection: 0

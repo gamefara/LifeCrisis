@@ -4,54 +4,100 @@ using UnityEngine;
 
 public class UnityChanController : MonoBehaviour
 {
+	//Unity-Inspectorから指定
+	public Camera CameraObject;
+	public bool StandingFlag = true;
+	public float Speed = 2.0f;
+	public float JumpPower = 60.0f;
 
-	Rigidbody body;
-	private Animator animator;
-
-	private const string parameterRun = "isRun";
-	private const string parameterJump = "isJump";
-	private const string parameterDamage = "isDamage";
-	public bool isGround = true;
-	public float speed = 2.0f;
-	public float jumpPower = 60.0f;
+	Rigidbody Body;
+	Animator AnimeAction;
+	const string ParameterRun = "isRun";
+	const string ParameterJump = "isJump";
+	Vector3 RestartPosition;
+	bool LastPushKeyLeft = false;
+	const int MaxJumpCoolTime = 5;
+	int NowJumpCoolTime = 0;
+	const int MaxCollisionCount = 120;
+	int NowCollisionCount = 0;
+	bool GoalFlag = false;
 
 	// Use this for initialization
 	void Start()
 	{
-		this.body = GetComponent<Rigidbody>();
-		this.animator = GetComponent<Animator>();
+		Body = GetComponent<Rigidbody>();
+		AnimeAction = GetComponent<Animator>();
+		RestartPosition = Vector3.zero;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		if(!isGround) return;
+		CheckUpdatePlayer();
+		CheckRestartPlayer();
+		CameraUpdatePosition();
 
-		bool isLeft = Input.GetKey(KeyCode.LeftArrow);
-		bool isRight = Input.GetKey(KeyCode.RightArrow);
-		bool isUp = Input.GetKey(KeyCode.UpArrow);
-		bool isDown = Input.GetKey(KeyCode.DownArrow);
-		bool isJump = Input.GetKey(KeyCode.Space);
-		bool isRun = (isLeft || isRight);
-		bool isRotate = (isUp || isDown);
+		if(GoalFlag) return;
+		if(!StandingFlag){
+			NowJumpCoolTime = 0;
+			return;
+		}
+		else if(NowJumpCoolTime < MaxJumpCoolTime) NowJumpCoolTime++;
+
+		bool leftMoveFlag = Input.GetKey(KeyCode.LeftArrow);
+		bool rightMoveFlag = Input.GetKey(KeyCode.RightArrow);
+		bool upRotateFlag = Input.GetKey(KeyCode.UpArrow);
+		bool downRotateFlag = Input.GetKey(KeyCode.DownArrow);
+		bool runFlag = (leftMoveFlag || rightMoveFlag);
+		bool RotateFlag = (upRotateFlag || downRotateFlag);
+		if(leftMoveFlag) LastPushKeyLeft = true;
+		else if(rightMoveFlag) LastPushKeyLeft = false;
 
 		//左右移動
-		if(isRun)
+		if(runFlag)
 		{
-			var v = body.velocity;
-			v.z = speed * (isLeft ? -1 : 1);
-			body.velocity = v;
-			transform.rotation = Quaternion.Euler(0, (isLeft ? 180 : 0), 0);
-			animator.SetBool(parameterRun, true);
+			PlayerUpdateVelocity(leftMoveFlag);
+			transform.rotation = Quaternion.Euler(0, (leftMoveFlag ? 180 : 0), 0);
+
+			if(AnimeAction.GetBool(ParameterJump)) return;
+			AnimeAction.SetBool(ParameterRun, true);
 		}
-		else animator.SetBool(parameterRun, false);
+		else AnimeAction.SetBool(ParameterRun, false);
 
 		//ジャンプ
-		if(isJump || isRotate)
+		if(RotateFlag)
 		{
-			if(animator.GetBool(parameterJump)) return;
-			body.AddForce(new Vector3(0, jumpPower, 0), ForceMode.Impulse);
+			if(AnimeAction.GetBool(ParameterJump) || NowJumpCoolTime < MaxJumpCoolTime) return;
+			StandingFlag = false;
+			Body.AddForce(new Vector3(0, JumpPower, 0), ForceMode.Impulse);
 		}
+	}
+
+	void CameraUpdatePosition(){
+		var c = CameraObject.transform.position;
+		c.z = this.transform.position.z;
+		CameraObject.transform.position = c;
+	}
+
+	void CheckUpdatePlayer(){
+		if(LastPushKeyLeft) this.transform.rotation = Quaternion.Euler(0, 180, 0);
+		else this.transform.rotation = Quaternion.Euler(0, 0, 0);
+	}
+
+	void CheckRestartPlayer(){
+		if(transform.position.y <= -30.0f) RestartPlayer();
+	}
+
+	void RestartPlayer(){ transform.position = RestartPosition; }
+
+	void PlayerUpdateVelocity(bool leftMoveFlag){
+		var v = Body.velocity;
+		v.z = Speed * (leftMoveFlag ? -1 : 1);
+		Body.velocity = v;
+	}
+
+	void GoalCheck(){
+		
 	}
 
 	void OnCollisionEnter(Collision col)
@@ -59,43 +105,42 @@ public class UnityChanController : MonoBehaviour
 		string tag = col.gameObject.tag;
 		if(tag == "Block")
 		{
-			isGround = true;
-			animator.SetBool(parameterJump, false);
-			var v = body.velocity;
-			v.x = 0;
-			body.velocity = v;
+			StandingFlag = true;
+			AnimeAction.SetBool(ParameterJump, false);
 		}
-		else if(tag == "DamageObject")
-		{
-			if(animator.GetBool(parameterDamage)) return;
-			StartCoroutine("DamageProcess");
+		else if(tag == "DamageObject"){
+			//落ちやすくなるよう2倍の反発力に変更
+			var v = Body.velocity;
+			v.x -= 2;
+			v.y -= 2;
+			v.z -= 2;
+			Body.velocity = v;
 		}
 	}
 
 	void OnCollisionExit(Collision col)
 	{
-		string tag = col.gameObject.tag;
-		if(tag == "Block")
-		{
-			isGround = false;
-			animator.SetBool(parameterRun, false);
-			animator.SetBool(parameterJump, true);
+		string name = col.gameObject.name;
+		if(!StandingFlag) {
+			AnimeAction.SetBool(ParameterJump, true);
+			AnimeAction.SetBool(ParameterRun, false);
 		}
-		else if(tag == "DamageObject")
-		{
-			isGround = false;
-			animator.SetBool(parameterRun, false);
-			animator.SetBool(parameterJump, false);
-		}
+		NowCollisionCount = 0;
 	}
 
-	IEnumerator DamageProcess()
+	private void OnCollisionStay(Collision col)
 	{
-		animator.SetBool(parameterDamage, true);
-		for(int i = 0; i < 60; i++)
+		string tag = col.gameObject.tag;
+		if(tag == "DamageObject")
 		{
-			yield return null;
+			if(NowCollisionCount < MaxCollisionCount) NowCollisionCount++;
+			else RestartPlayer();
 		}
-		animator.SetBool(parameterDamage, false);
+		else if(tag == "Goal")
+		{
+			GoalFlag = true;
+			AnimeAction.SetBool(ParameterRun, false);
+			AnimeAction.SetBool(ParameterJump, false);
+		}
 	}
 }
