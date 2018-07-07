@@ -6,10 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/UnityChan2D/Demo/Scenes/Start.unity
+    path: Assets/LifeCrisis/Scenes/Title.unity
+    guid: d61da204080de4ada90108288c420169
   - enabled: 1
-    path: Assets/UnityChan2D/Demo/Scenes/Loading 1-1.unity
+    path: Assets/LifeCrisis/Scenes/Stage1.unity
+    guid: 8fc37821c0c417b4d8804696ee2185e7
   - enabled: 1
-    path: Assets/UnityChan2D/Demo/Scenes/Intro 1-1.unity
+    path: Assets/LifeCrisis/Scenes/Stage2.unity
+    guid: a3283e8d07b284846bb3f0179d58a2d5
   - enabled: 1
-    path: Assets/UnityChan2D/Demo/Scenes/World 1-1.unity
+    path: Assets/LifeCrisis/Scenes/Stage3.unity
+    guid: 6f9caa4fb870d4e97b3cbaef46363c57
+  m_configObjects: {}

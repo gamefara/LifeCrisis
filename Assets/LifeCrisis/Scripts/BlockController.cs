@@ -46,6 +46,7 @@ public class BlockController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if(PlayerScript.GoalFlag) return;
 		if(RotateFlag) return;
 
 		bool isUp = Input.GetKey(KeyCode.UpArrow);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UnityChanController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class UnityChanController : MonoBehaviour
 	public bool StandingFlag = true;
 	public float Speed = 2.0f;
 	public float JumpPower = 60.0f;
+	public Button ClearButton;
 
 	Rigidbody Body;
 	Animator AnimeAction;
@@ -20,7 +22,7 @@ public class UnityChanController : MonoBehaviour
 	int NowJumpCoolTime = 0;
 	const int MaxCollisionCount = 120;
 	int NowCollisionCount = 0;
-	bool GoalFlag = false;
+	[SerializeField] public bool GoalFlag = false;
 
 	// Use this for initialization
 	void Start()
@@ -96,10 +98,6 @@ public class UnityChanController : MonoBehaviour
 		Body.velocity = v;
 	}
 
-	void GoalCheck(){
-		
-	}
-
 	void OnCollisionEnter(Collision col)
 	{
 		string tag = col.gameObject.tag;
@@ -108,6 +106,7 @@ public class UnityChanController : MonoBehaviour
 			StandingFlag = true;
 			AnimeAction.SetBool(ParameterJump, false);
 		}
+		else if(tag == "Goal") StartCoroutine("StageClearProcess");
 		else if(tag == "DamageObject"){
 			//落ちやすくなるよう2倍の反発力に変更
 			var v = Body.velocity;
@@ -143,4 +142,20 @@ public class UnityChanController : MonoBehaviour
 			AnimeAction.SetBool(ParameterJump, false);
 		}
 	}
+
+	IEnumerator StageClearProcess()
+	{
+		int count = 60;
+		//クリアUI表示
+		for(int i = 0; i < count; i++)
+		{
+			yield return null;
+		}
+
+		//ゴールについた後何らかの原因で落ちた場合何もしない
+		if(!GoalFlag) yield break;
+
+		ClearButton.gameObject.SetActive(true);
+	}
+
 }
