@@ -49,23 +49,14 @@ public class BlockController : MonoBehaviour
 		if(PlayerScript.GoalFlag) return;
 		if(RotateFlag) return;
 
-		bool isUp = Input.GetKey(KeyCode.UpArrow);
-		bool isDown = Input.GetKey(KeyCode.DownArrow);
-		if(isUp || isDown)
-		{
-			if(isUp) JumpMode = (int)JumpType.UpRotate;
-			else if(isDown) JumpMode = (int)JumpType.DownRotate;
-			else JumpMode = (int)JumpType.NoRotate;
-
-			StartCoroutine("RotateBlock");
-		}
-
+		if(PlayerScript.PushButtonUp || PlayerScript.PushButtonDown) StartCoroutine("RotateBlock");
 		var pos = Block.transform.position;
 
-		BlockTimer = (BlockTimer + 0.01f) % (360.0f * Mathf.Deg2Rad);
+		//Time.timeのエイリアス(回転中はカウントしない)
+		BlockTimer = (BlockTimer + 0.01f) % (2 * Mathf.PI);
 		NowRatio = Mathf.Sin(Speed * BlockTimer);
 		MoveBlockRadius = MaxLength * NowRatio;
-		//Time.timeのエイリアス(回転中はカウントしない)
+
 		if(Block.name == "BlockMoveX")
 		{
 			//中心点そのものの円運動
@@ -98,14 +89,14 @@ public class BlockController : MonoBehaviour
 		for(int i = 0; i < 10; i++) yield return null;
 
 		var rotateCount = 30;
-		float addAngle = (JumpMode == (int)JumpType.UpRotate ? -1 : 1) * 90.0f / rotateCount;
+		float addAngle = (PlayerScript.PushButtonUp ? -1 : 1) * 90.0f / rotateCount;
 
 		var pos = Block.transform.position;
 		float radian;
 		for(int i = 0; i < rotateCount; i++)
 		{
 			//オブジェクト回転
-			if(JumpMode != (int)JumpType.NoRotate) CenterAngle += addAngle;
+			CenterAngle += addAngle;
 			if(CenterAngle < 0.0f) CenterAngle += 360.0f;
 			else if(CenterAngle >= 360.0f) CenterAngle %= 360;
 			Block.transform.rotation = Quaternion.Euler(0, 0, CenterAngle);
@@ -133,5 +124,7 @@ public class BlockController : MonoBehaviour
 
 		while(!PlayerScript.StandingFlag) yield return null;
 		RotateFlag = false;
+		PlayerScript.PushButtonUp = false;
+		PlayerScript.PushButtonDown = false;
 	}
 }
