@@ -44,41 +44,18 @@ public class UnityChanController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if(GoalFlag) return;
+
 		CheckUpdatePlayer();
 		CheckRestartPlayer();
 		CameraUpdatePosition();
 
-		if(GoalFlag) return;
 		if(!StandingFlag)
 		{
 			NowJumpCoolTime = 0;
 			return;
 		}
 		else if(NowJumpCoolTime < MaxJumpCoolTime) NowJumpCoolTime++;
-
-		bool runFlag = (PushButtonLeft || PushButtonRight);
-		bool rotateFlag = (PushButtonUp || PushButtonDown);
-
-		//左右移動
-		if(runFlag)
-		{
-			PlayerUpdateVelocity(PushButtonLeft);
-			transform.rotation = Quaternion.Euler(0, (PushButtonLeft ? 180 : 0), 0);
-
-			if(AnimeAction.GetBool(ParameterJump)) return;
-			AnimeAction.SetBool(ParameterRun, true);
-		}
-		else AnimeAction.SetBool(ParameterRun, false);
-
-		//ジャンプ
-		if(rotateFlag)
-		{
-			//キャラクターが空中にいる場合、クールタイム終了してない場合は何もしない
-			var jumpFlag = AnimeAction.GetBool(ParameterJump);
-			if(jumpFlag || NowJumpCoolTime < MaxJumpCoolTime) return;
-			StandingFlag = false;
-			Body.AddForce(new Vector3(0, JumpPower, 0), ForceMode.Impulse);
-		}
 	}
 
 	void CameraUpdatePosition()
@@ -90,9 +67,32 @@ public class UnityChanController : MonoBehaviour
 
 	void CheckUpdatePlayer()
 	{
-		if(PushButtonLeft) this.transform.rotation = Quaternion.Euler(0, 180, 0);
-		else this.transform.rotation = Quaternion.Euler(0, 0, 0);
+		//ジャンプ
+		if(PushButtonUp || PushButtonDown)
+		{
+			//キャラクターが空中にいる場合、クールタイム終了してない場合は何もしない
+			var jumpFlag = AnimeAction.GetBool(ParameterJump);
+			if(jumpFlag || NowJumpCoolTime < MaxJumpCoolTime) return;
+			AnimeAction.SetBool(ParameterJump, true);
+			AnimeAction.SetBool(ParameterRun, false);
+			StandingFlag = false;
+			Body.AddForce(new Vector3(0, JumpPower, 0), ForceMode.Impulse);
+		}
 
+		var v = Body.velocity;
+		//左右移動
+		if(PushButtonLeft || PushButtonRight)
+		{
+			if(!AnimeAction.GetBool(ParameterJump)) AnimeAction.SetBool(ParameterRun, true);
+			v.z = (PushButtonLeft ? -1 : 1) * Speed;
+			transform.rotation = Quaternion.Euler(0, (PushButtonLeft ? 180 : 0), 0);
+		}
+		else
+		{
+			AnimeAction.SetBool(ParameterRun, false);
+			v.z = 0;
+		}
+		Body.velocity = v;
 	}
 
 	void CheckRestartPlayer()
@@ -103,18 +103,14 @@ public class UnityChanController : MonoBehaviour
 	void RestartPlayer()
 	{
 		transform.position = RestartPosition;
+		transform.rotation = Quaternion.Euler(0, 0, 0);
+		Body.velocity = Vector3.zero;
+		Body.AddForce(0, 0, 0);
 		PushButtonUp = false;
 		PushButtonDown = false;
 		PushButtonLeft = false;
 		PushButtonRight = false;
 		PushButtonStop = true;
-	}
-
-	void PlayerUpdateVelocity(bool leftMoveFlag)
-	{
-		var v = Body.velocity;
-		v.z = Speed * (leftMoveFlag ? -1 : 1);
-		Body.velocity = v;
 	}
 
 	void OnCollisionEnter(Collision col)
@@ -140,8 +136,6 @@ public class UnityChanController : MonoBehaviour
 	void OnCollisionExit(Collision col)
 	{
 		StandingFlag = false;
-		AnimeAction.SetBool(ParameterJump, true);
-		AnimeAction.SetBool(ParameterRun, false);
 		NowCollisionCount = 0;
 	}
 
