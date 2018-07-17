@@ -6,18 +6,24 @@ using UnityEngine.UI;
 
 public class ButtonController : MonoBehaviour
 {
+	public AudioClip AudioObject;
 	public Sprite NoUsedSprite;
 	public Sprite UsedSprite;
+	public GameObject TitleObject;
+	public GameObject LicenseObject;
 
+	AudioSource AudioBase;
 	static UnityChanController PlayerScript;
 	static DataController DataScript;
 	Image CheckImage;
 	static string SceneName;
 	string ButtonName;
 	static string StageName = "Stage1";
+	static bool TitleActive = true;
 
 	void Start()
 	{
+		AudioBase = GetComponent<AudioSource>();
 		SceneName = SceneManager.GetActiveScene().name;
 		ButtonName = gameObject.name;
 		if(SceneName != "Title") PlayerScript = GameObject.Find("unitychan").GetComponent<UnityChanController>();
@@ -44,7 +50,6 @@ public class ButtonController : MonoBehaviour
 	//Click Event
 	public void OnClick()
 	{
-		string name = gameObject.name;
 		if(ButtonName == "Stage1Button")
 		{
 			StageName = "Stage1";
@@ -66,7 +71,18 @@ public class ButtonController : MonoBehaviour
 			DataScript.Stage2Button.image.color = new Color(1, 1, 1);
 			DataScript.Stage3Button.image.color = new Color(0, 1, 1);
 		}
-		else if(ButtonName == "StartButton") SceneManager.LoadScene(StageName);
+		else if(ButtonName == "StartButton")
+		{
+			SceneManager.LoadScene(StageName);
+		}
+		else if(ButtonName == "LicenseButton")
+		{
+			SwitchScreen();
+		}
+		else if(ButtonName == "BuckButton")
+		{
+			SwitchScreen();
+		}
 		else if(ButtonName == "ClearButton")
 		{
 			if(SceneName == "Stage1")
@@ -87,35 +103,42 @@ public class ButtonController : MonoBehaviour
 		}
 		else if(ButtonName == "JumpUpButton")
 		{
+			AudioBase.PlayOneShot(AudioObject);
 			PlayerScript.PushButtonUp = true;
 			PlayerScript.PushButtonDown = false;
 		}
 		else if(ButtonName == "JumpDownButton")
 		{
+			AudioBase.PlayOneShot(AudioObject);
 			PlayerScript.PushButtonUp = false;
 			PlayerScript.PushButtonDown = true;
 		}
 		else if(ButtonName == "LeftButton")
 		{
-			PlayerScript.PushButtonUp = false;
-			PlayerScript.PushButtonDown = false;
+			AudioBase.PlayOneShot(AudioObject);
 			PlayerScript.PushButtonLeft = true;
 			PlayerScript.PushButtonRight = false;
 			PlayerScript.PushButtonStop = false;
 		}
 		else if(ButtonName == "RightButton")
 		{
-			PlayerScript.PushButtonUp = false;
-			PlayerScript.PushButtonDown = false;
+			AudioBase.PlayOneShot(AudioObject);
 			PlayerScript.PushButtonLeft = false;
 			PlayerScript.PushButtonRight = true;
 			PlayerScript.PushButtonStop = false;
 		}
 		else if(ButtonName == "StopButton")
 		{
+			AudioBase.PlayOneShot(AudioObject);
 			PlayerScript.PushButtonLeft = false;
 			PlayerScript.PushButtonRight = false;
 			PlayerScript.PushButtonStop = true;
 		}
+	}
+
+	void SwitchScreen(){
+		TitleActive = !TitleActive;
+		TitleObject.SetActive(TitleActive);
+		LicenseObject.SetActive(!TitleActive);
 	}
 }

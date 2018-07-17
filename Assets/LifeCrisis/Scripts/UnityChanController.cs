@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 public class UnityChanController : MonoBehaviour
 {
 	//Unity-Inspectorから指定
+	public AudioClip RestartAudioObject;
+	public AudioClip CollisionAudioObject;
+	public AudioClip ClearAudioObject;
 	public Camera CameraObject;
 	public float Speed = 2.0f;
 	public float JumpPower = 60.0f;
@@ -23,6 +26,7 @@ public class UnityChanController : MonoBehaviour
 	[System.NonSerialized] public bool PushButtonRight = false;
 	[System.NonSerialized] public bool PushButtonStop = true;
 
+	AudioSource AudioBase;
 	Rigidbody Body;
 	Animator AnimeAction;
 	const string ParameterRun = "isRun";
@@ -36,6 +40,7 @@ public class UnityChanController : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+		AudioBase = GetComponent<AudioSource>();
 		Body = GetComponent<Rigidbody>();
 		AnimeAction = GetComponent<Animator>();
 		RestartPosition = Vector3.zero;
@@ -44,6 +49,9 @@ public class UnityChanController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		//キャラクターが障害物に押されて回転するのを防ぐ
+		Body.angularVelocity = Vector3.zero;
+
 		if(GoalFlag) return;
 
 		CheckUpdatePlayer();
@@ -72,25 +80,28 @@ public class UnityChanController : MonoBehaviour
 		{
 			//キャラクターが空中にいる場合、クールタイム終了してない場合は何もしない
 			var jumpFlag = AnimeAction.GetBool(ParameterJump);
-			if(jumpFlag || NowJumpCoolTime < MaxJumpCoolTime) return;
-			AnimeAction.SetBool(ParameterJump, true);
-			AnimeAction.SetBool(ParameterRun, false);
-			StandingFlag = false;
-			Body.AddForce(new Vector3(0, JumpPower, 0), ForceMode.Impulse);
+			if(!jumpFlag && NowJumpCoolTime >= MaxJumpCoolTime)
+			{
+				AnimeAction.SetBool(ParameterJump, true);
+				AnimeAction.SetBool(ParameterRun, false);
+				Body.AddForce(new Vector3(0, JumpPower, 0), ForceMode.Impulse);
+			}
 		}
 
 		var v = Body.velocity;
+		//停止
+		if(PushButtonStop)
+		{
+			AnimeAction.SetBool(ParameterRun, false);
+			v.z = 0;
+		}
+
 		//左右移動
 		if(PushButtonLeft || PushButtonRight)
 		{
 			if(!AnimeAction.GetBool(ParameterJump)) AnimeAction.SetBool(ParameterRun, true);
 			v.z = (PushButtonLeft ? -1 : 1) * Speed;
 			transform.rotation = Quaternion.Euler(0, (PushButtonLeft ? 180 : 0), 0);
-		}
-		else
-		{
-			AnimeAction.SetBool(ParameterRun, false);
-			v.z = 0;
 		}
 		Body.velocity = v;
 	}
@@ -102,10 +113,11 @@ public class UnityChanController : MonoBehaviour
 
 	void RestartPlayer()
 	{
+		AudioBase.PlayOneShot(RestartAudioObject);
+		Body.velocity = Vector3.zero;
 		transform.position = RestartPosition;
 		transform.rotation = Quaternion.Euler(0, 0, 0);
-		Body.velocity = Vector3.zero;
-		Body.AddForce(0, 0, 0);
+
 		PushButtonUp = false;
 		PushButtonDown = false;
 		PushButtonLeft = false;
@@ -142,7 +154,8 @@ public class UnityChanController : MonoBehaviour
 	private void OnCollisionStay(Collision col)
 	{
 		string tag = col.gameObject.tag;
-		if(tag == "DamageObject")
+		if(tag == "Block") StandingFlag = true;
+		else if(tag == "DamageObject")
 		{
 			if(NowCollisionCount < MaxCollisionCount) NowCollisionCount++;
 			else RestartPlayer();
@@ -159,14 +172,12 @@ public class UnityChanController : MonoBehaviour
 	{
 		int count = 60;
 		//クリアUI表示
-		for(int i = 0; i < count; i++)
-		{
-			yield return null;
-		}
+		for(int i = 0; i < count; i++) yield return null;
 
 		//ゴールについた後何らかの原因で落ちた場合何もしない
 		if(!GoalFlag) yield break;
 
+		AudioBase.PlayOneShot(ClearAudioObject);
 		ClearPanel.gameObject.SetActive(true);
 		TitleButton.gameObject.SetActive(true);
 		if(SceneManager.GetActiveScene().name != "Stage3") ClearButton.gameObject.SetActive(true);

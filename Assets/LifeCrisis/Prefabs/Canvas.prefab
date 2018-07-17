@@ -325,8 +325,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 21300000, guid: 88ce9646156a64269a5e004c7e0f6dc1, type: 3}
   UsedSprite: {fileID: 21300000, guid: 1985368da87034099b621e80ade217f7, type: 3}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114087460018848218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -338,8 +341,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 21300000, guid: e2b78e12d33614576a55c29d1c2a56b8, type: 3}
   UsedSprite: {fileID: 21300000, guid: 7dd427ca46f1b4f59aa42a2790b00e87, type: 3}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114088959508735932
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -430,8 +436,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 0}
   UsedSprite: {fileID: 0}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114201851091006488
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -443,8 +452,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 21300000, guid: e94ef1b354fdf43fd8f738ff0685b7c8, type: 3}
   UsedSprite: {fileID: 21300000, guid: f40f8f6bbf887419d9f1973f90d978a7, type: 3}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114268545319525742
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -508,8 +520,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 21300000, guid: 3bb93b968fd754317aa4fe5a62d11e38, type: 3}
   UsedSprite: {fileID: 21300000, guid: 05cdb92b77f794cd68b4bc386ccae232, type: 3}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114309568044849464
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -548,8 +563,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 0}
   UsedSprite: {fileID: 0}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114392952413840356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -646,11 +664,11 @@ MonoBehaviour:
   m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 2
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -843,8 +861,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5100d7c25d4c430d816690177d311eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AudioObject: {fileID: 0}
   NoUsedSprite: {fileID: 21300000, guid: 7f6ce7d5cc7a8453cba4240416c22d06, type: 3}
   UsedSprite: {fileID: 21300000, guid: 25978f5c05e1a47e8a767003981f1455, type: 3}
+  TitleObject: {fileID: 0}
+  LicenseObject: {fileID: 0}
 --- !u!114 &114822529200143568
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1281,7 +1302,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250, y: 0}
+  m_AnchoredPosition: {x: -300, y: -120}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224492770939045072
@@ -1433,7 +1454,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 704, y: 424}
+  m_SizeDelta: {x: 800, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224931376976476414
 RectTransform:
